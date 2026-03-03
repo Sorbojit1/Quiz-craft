@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quizcraft — Build & Play Quizzes</title>
+<meta name="description" content="Quizcraft lets you build, save, and play interactive quizzes with timers, hints, scoring, and more. Free, no sign-up.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,900;1,300;1,600&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script defer src="script.js"></script>
+</head>
+<body>
+
+<canvas id="cfcanvas"></canvas>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="nav">
+  <div class="nav-logo" onclick="go('home')">
+    <div class="nav-logo-mark">Q</div>
+    Quiz<em>craft</em>
+  </div>
+  <div class="nav-pills">
+    <button class="npill on" id="nb-home"   onclick="go('home',this)">Home</button>
+    <button class="npill"    id="nb-library" onclick="go('library',this)">Library</button>
+    <button class="npill"    id="nb-maker"   onclick="go('maker',this)">Make</button>
+    <button class="npill"    id="nb-play"    onclick="go('play',this)">Play</button>
+    <button class="npill"    id="nb-about"   onclick="go('about',this)">About</button>
+  </div>
+  <div class="nav-end">
+    <a class="nav-gh" href="https://github.com/Sorbojit1" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      Sorbojit1
+    </a>
+    <button class="nav-icon-btn" id="themeBtn" onclick="cycleTheme()" title="Theme [T]">🌙</button>
+    <button class="nav-icon-btn" onclick="openModal('settingsModal')" title="Settings">⚙</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════
+     HOME
+══════════════════════════════════ -->
+<div id="home" class="page on">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-blob hero-blob-3"></div>
+    <div class="hero-eyebrow">Free · No sign-up · Works offline</div>
+    <h1>
+      Build quizzes
+      <span class="outline">that slap.</span>
+    </h1>
+    <p class="hero-sub">
+      <strong>Quizcraft</strong> is a fully-featured quiz builder & player.
+      Create timed questions, track scores, challenge friends — all in your browser.
+    </p>
+    <div class="hero-btns">
+      <button class="btn-ac" onclick="go('maker',document.getElementById('nb-maker'))">Start building →</button>
+      <button class="btn-out" onclick="loadDemo();go('play',document.getElementById('nb-play'))">▶ Try demo quiz</button>
+    </div>
+    <div class="hero-badge-row">
+      <div class="hero-badge"><span>20+</span> features</div>
+      <div class="hero-badge"><span>4</span> question types</div>
+      <div class="hero-badge"><span>3</span> colour themes</div>
+      <div class="hero-badge"><span>∞</span> saved quizzes</div>
+    </div>
+    <div class="scroll-hint">
+      Scroll to explore
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-band">
+    <div class="stats-inner">
+      <div class="stat-col"><span class="stat-n" id="sQuizzes">0</span><span class="stat-l">Quizzes saved</span></div>
+      <div class="stat-col"><span class="stat-n" id="sQns">0</span><span class="stat-l">Questions made</span></div>
+      <div class="stat-col"><span class="stat-n" id="sPlays">0</span><span class="stat-l">Times played</span></div>
+      <div class="stat-col"><span class="stat-n" id="sBest">—</span><span class="stat-l">Your best score</span></div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="inner">
+      <span class="section-tag">How it works</span>
+      <h2 class="section-h">Three steps, zero friction.</h2>
+      <div class="how-steps">
+        <div class="how-step">
+          <span class="step-num">01 / 03</span>
+          <h3>Create</h3>
+          <p>Add questions using our rich maker. Multiple choice, true/false, free text, or ordering.</p>
+          <span class="how-step-arrow">→</span>
+        </div>
+        <div class="how-step">
+          <span class="step-num">02 / 03</span>
+          <h3>Configure</h3>
+          <p>Set timers, point values, difficulty, hints, images, and shuffle settings.</p>
+          <span class="how-step-arrow">→</span>
+        </div>
+        <div class="how-step">
+          <span class="step-num">03 / 03</span>
+          <h3>Play & share</h3>
+          <p>Play instantly, track your scores, export as JSON, or share the file with anyone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES BENTO -->
+  <section class="section" style="padding-top:0">
+    <div class="inner">
+      <span class="section-tag">Features</span>
+      <h2 class="section-h">Everything you need.</h2>
+      <p class="section-sub">No bloat. Just powerful tools to build and enjoy quizzes that feel great.</p>
+      <div class="bento">
+        <div class="bento-card wide">
+          <span class="bento-icon">⏱</span>
+          <h3>Countdown timers</h3>
+          <p>Set a per-question timer from 5 to 120 seconds. An animated circular ring shows time remaining — turns red when urgent. Auto-moves to next question on timeout.</p>
+          <span class="bento-tag">Play feature</span>
+        </div>
+        <div class="bento-card">
+          <span class="bento-icon">💡</span>
+          <h3>Hints</h3>
+          <p>Add an optional hint to each question. Players reveal it when stuck — good for learning.</p>
+        </div>
+        <div class="bento-card">
+          <span class="bento-icon">📊</span>
+          <h3>Detailed analytics</h3>
+          <p>Score circle, points earned, accuracy %, correct/wrong breakdown, and play history leaderboard.</p>
+        </div>
+        <div class="bento-card">
+          <span class="bento-icon">🖼</span>
+          <h3>Image questions</h3>
+          <p>Attach an image URL to any question. Previews live in maker and play mode.</p>
+        </div>
+        <div class="bento-card">
+          <span class="bento-icon">🏆</span>
+          <h3>Score history</h3>
+          <p>Top 10 attempts saved per quiz. A leaderboard shows your best plays ranked.</p>
+        </div>
+        <div class="bento-card wide">
+          <span class="bento-icon">💾</span>
+          <h3>Save & Library</h3>
+          <p>Unlimited quizzes saved locally in your browser. Browse, edit, play, or delete from a clean library page. Export as JSON to back up or share. Import JSON to restore any time.</p>
+          <span class="bento-tag">localStorage</span>
+        </div>
+        <div class="bento-card">
+          <span class="bento-icon">🔀</span>
+          <h3>Shuffle mode</h3>
+          <p>Toggle question shuffling per quiz so the order is different every run.</p>
+        </div>
+        <div class="bento-card">
+          <span class="bento-icon">🎨</span>
+          <h3>3 themes</h3>
+          <p>Dark (default), Light, and Neon. Persisted across sessions. Cycle with <kbd style="background:var(--s3);border:1px solid var(--bd);border-radius:3px;padding:1px 5px;font-size:.7rem">T</kbd>.</p>
+        </div>
+        <div class="bento-card">
+          <span class="bento-icon">⌨</span>
+          <h3>Keyboard shortcuts</h3>
+          <p>Answer questions with A B C D, Next with Enter, shortcuts for save and add.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <div class="quote-section">
+    <div class="inner">
+      <p class="big-quote">"Learning sticks when it's <em>actually fun.</em> Quizcraft makes it easy to make quizzes that people enjoy."</p>
+      <p class="quote-attr">— Sorbojit, creator of Quizcraft</p>
+    </div>
+  </div>
+
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <h2>Ready to build?</h2>
+    <p>No account, no download — just open and go.</p>
+    <button class="btn-ac" onclick="go('maker',document.getElementById('nb-maker'))">Make your first quiz →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     LIBRARY
+══════════════════════════════════ -->
+<div id="library" class="page">
+  <div class="lib-header">
+    <div class="inner-md">
+      <div class="lib-header-inner">
+        <div>
+          <div class="lib-title">My <span>Library</span></div>
+          <div style="color:var(--tx2);font-size:.88rem;margin-top:6px">Saved in your browser</div>
+        </div>
+        <div class="lib-actions">
+          <button class="btn-sm" style="flex:none;padding:10px 18px" onclick="importQuiz()">📥 Import JSON</button>
+          <button class="btn-ac" onclick="newQuiz()" style="padding:10px 24px">＋ New quiz</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="inner-md" style="padding-bottom:80px">
+    <div class="lib-search">
+      <input id="libSearch" type="text" placeholder="Search quizzes…" oninput="renderLibrary()">
+    </div>
+    <div class="lib-grid" id="libGrid"></div>
+    <div class="lib-empty" id="libEmpty" style="display:none">
+      <div class="ei">📚</div>
+      <h3>Your library is empty</h3>
+      <p>Create and save your first quiz to see it here</p>
+      <button class="btn-ac" onclick="newQuiz()">Create a quiz</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MAKER
+══════════════════════════════════ -->
+<div id="maker" class="page">
+  <div class="maker-header">
+    <div class="inner-md">
+      <div class="maker-header-inner">
+        <div class="maker-title">Quiz <span>Maker</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="tb2-btn" onclick="shuffleQs()">🔀 Shuffle</button>
+          <button class="tb2-btn" onclick="exportJSON()">📤 Export</button>
+          <button class="tb2-btn" onclick="importQuiz()">📥 Import</button>
+          <button class="tb2-btn" style="border-color:var(--dk);color:var(--dk)" onclick="clearAll()">🗑</button>
+          <button class="btn-ac" style="padding:8px 22px;border-radius:50px;border:none;font-weight:700;font-size:.85rem;cursor:pointer" onclick="saveQuiz()">💾 Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="inner-md" style="padding-bottom:100px">
+    <div class="toolbar2">
+      <button class="tb2-btn add-btn" onclick="mkCard('mcq')">＋ Multiple choice</button>
+      <button class="tb2-btn add-btn" onclick="mkCard('truefalse')">＋ True / False</button>
+      <button class="tb2-btn add-btn" onclick="mkCard('text')">＋ Free text</button>
+      <button class="tb2-btn add-btn" onclick="mkCard('ordering')">＋ Ordering</button>
+      <div class="tb2-sep"></div>
+      <button class="tb2-btn" onclick="randFill()">🎲 Random fill</button>
+      <button class="tb2-btn" onclick="go('play',document.getElementById('nb-play'))">▶ Preview</button>
+    </div>
+
+    <div class="quiz-meta-wrap">
+      <input class="qtitle" id="qTitle" placeholder="Quiz title…" type="text">
+      <div class="meta-row">
+        <div class="mfield" style="flex:2">
+          <span class="mlabel">Description</span>
+          <input class="minp" id="qDesc" placeholder="Optional description…" type="text">
+        </div>
+        <div class="mfield">
+          <span class="mlabel">Category</span>
+          <input class="minp" id="qCat" placeholder="e.g. Science" type="text">
+        </div>
+        <div class="mfield" style="max-width:120px">
+          <span class="mlabel">Difficulty</span>
+          <select class="minp" id="qDiff">
+            <option value="">Mixed</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+      <div class="timer-row">
+        <label class="tgl"><input type="checkbox" id="timerOn" onchange="updateTimerUI()"><span class="tgl-s"></span></label>
+        <span class="tgl-lbl">Timer</span>
+        <input type="range" class="tgl-range" id="timerSlider" min="5" max="120" value="30" step="5"
+          oninput="document.getElementById('timerV').textContent=this.value+'s'">
+        <span class="tgl-val" id="timerV">30s</span>
+        <span style="width:1px;height:14px;background:var(--bd);margin:0 4px"></span>
+        <label class="tgl"><input type="checkbox" id="shuffleOn"><span class="tgl-s"></span></label>
+        <span class="tgl-lbl">Shuffle</span>
+        <label class="tgl"><input type="checkbox" id="soundOn" checked><span class="tgl-s"></span></label>
+        <span class="tgl-lbl">Sound</span>
+      </div>
+    </div>
+
+    <div class="cards-wrap" id="cardsWrap"></div>
+    <div class="m-empty" id="mkEmpty">
+      <div class="ei">✏️</div>
+      <h3>No questions yet</h3>
+      <p>Click one of the question type buttons above</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PLAY
+══════════════════════════════════ -->
+<div id="play" class="page">
+  <div class="play-wrap">
+    <div class="play-top-bar">
+      <div>
+        <div class="play-qname" id="playName">Quiz</div>
+        <div style="font-size:.8rem;color:var(--tx2);margin-top:2px" id="playMeta"></div>
+      </div>
+      <div class="play-ctrl">
+        <button class="play-ctrl-btn" id="sfxBtn" onclick="this.classList.toggle('on')">🔊 SFX</button>
+        <button class="play-ctrl-btn" onclick="initPlay()">↺ Restart</button>
+        <button class="play-ctrl-btn" onclick="document.getElementById('play').requestFullscreen?.()">⛶</button>
+      </div>
+    </div>
+    <div id="playArea"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ABOUT
+══════════════════════════════════ -->
+<div id="about" class="page">
+  <div class="inner-md">
+
+    <div class="about-hero">
+      <div class="about-h">About<br><em>Quizcraft.</em></div>
+      <p class="about-sub">
+        Quizcraft is a passion project — a fully client-side quiz builder and player built with
+        pure HTML, CSS, and vanilla JavaScript. No frameworks, no backend, no tracking. Just a
+        slick tool that works, saved to your browser.
+      </p>
+      <div class="creator-card" id="creatorCard">
+        <div class="creator-avatar">S</div>
+        <div class="creator-info">
+          <h3>Sorbojit</h3>
+          <p>Creator & developer of Quizcraft</p>
+          <div class="creator-links">
+            <a class="creator-link" href="https://github.com/Sorbojit1" target="_blank">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              @Sorbojit1
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-col">
+        <h2>The mission</h2>
+        <p>Most quiz builders are either too simple or locked behind sign-ups and paywalls. Quizcraft was built to be genuinely useful, free, and satisfying to use.</p>
+        <p>Everything runs in your browser. Nothing is sent to a server. Your quizzes are yours.</p>
+        <p>It started as a basic card maker and grew into a full quiz platform — timers, scoring, analytics, a library, themes, sounds, and more.</p>
+      </div>
+      <div class="about-col">
+        <h2>What's included</h2>
+        <ul>
+          <li>4 question types (MCQ, T/F, text, ordering)</li>
+          <li>Per-question timers, hints, images, points</li>
+          <li>Save & manage unlimited quizzes</li>
+          <li>Export / import as portable JSON</li>
+          <li>Detailed score analytics & play history</li>
+          <li>3 colour themes (dark / light / neon)</li>
+          <li>Keyboard shortcuts for everything</li>
+          <li>Confetti on a perfect score 🎉</li>
+          <li>Drag-to-reorder questions</li>
+          <li>Undo deleted questions</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tech stack -->
+    <span class="section-tag">Built with</span>
+    <h2 class="section-h" style="font-size:1.8rem;margin-bottom:28px">Tech stack</h2>
+    <div class="stack-grid" style="margin-bottom:60px">
+      <div class="stack-card"><div class="stack-icon">🌐</div><div class="stack-name">HTML5</div><div class="stack-desc">Semantic markup</div></div>
+      <div class="stack-card"><div class="stack-icon">🎨</div><div class="stack-name">CSS3</div><div class="stack-desc">Custom properties, grid, flex</div></div>
+      <div class="stack-card"><div class="stack-icon">⚡</div><div class="stack-name">Vanilla JS</div><div class="stack-desc">Zero dependencies</div></div>
+      <div class="stack-card"><div class="stack-icon">🔊</div><div class="stack-name">Web Audio API</div><div class="stack-desc">Sound effects</div></div>
+      <div class="stack-card"><div class="stack-icon">💾</div><div class="stack-name">localStorage</div><div class="stack-desc">Persistent storage</div></div>
+      <div class="stack-card"><div class="stack-icon">🖋</div><div class="stack-name">Google Fonts</div><div class="stack-desc">Fraunces, Outfit, DM Mono</div></div>
+    </div>
+
+    <!-- Changelog -->
+    <span class="section-tag">Changelog</span>
+    <h2 class="section-h" style="font-size:1.8rem;margin-bottom:36px">Version history</h2>
+    <div class="changelog">
+      <div class="cl-entry">
+        <div class="cl-meta">
+          <div class="cl-version">v2.0.0</div>
+          <div class="cl-date">Current</div>
+          <span class="cl-badge major">Major</span>
+        </div>
+        <div class="cl-body">
+          <h4>Full platform release</h4>
+          <ul>
+            <li>Complete 5-page website (Home, Library, Maker, Play, About)</li>
+            <li>Library with save/load/delete, search, play stats</li>
+            <li>Timer rings, sound effects, confetti on 100%</li>
+            <li>Drag-to-reorder, undo delete, random fill</li>
+            <li>Export / import JSON, keyboard shortcuts</li>
+            <li>3 themes (dark, light, neon) with persistence</li>
+            <li>Custom cursor, grain texture, animated blobs</li>
+            <li>Detailed score screen with history leaderboard</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cl-entry">
+        <div class="cl-meta">
+          <div class="cl-version">v1.1.0</div>
+          <div class="cl-date">Previous</div>
+          <span class="cl-badge minor">Minor</span>
+        </div>
+        <div class="cl-body">
+          <h4>Feature expansion</h4>
+          <ul>
+            <li>Hints, image URLs, custom point values per question</li>
+            <li>Difficulty tags (easy/medium/hard)</li>
+            <li>Score analytics with breakdown</li>
+            <li>Shuffle mode and sound toggle</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cl-entry">
+        <div class="cl-meta">
+          <div class="cl-version">v1.0.0</div>
+          <div class="cl-date">Initial</div>
+          <span class="cl-badge patch">Release</span>
+        </div>
+        <div class="cl-body">
+          <h4>Initial release</h4>
+          <ul>
+            <li>Basic quiz card maker with MCQ, T/F, free text</li>
+            <li>Play mode with score tracking</li>
+            <li>Dark theme, simple styling</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     FOOTER
+══════════════════════════════════ -->
+<footer id="site-footer">
+  <div class="inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="fb-logo">
+          <div class="fb-mark">Q</div>
+          Quizcraft
+        </div>
+        <p>A free, open-source quiz builder and player. No sign-up, no tracking, no nonsense. Built with love in pure HTML/CSS/JS.</p>
+        <div class="footer-brand-links">
+          <a class="fb-link" href="https://github.com/Sorbojit1" target="_blank">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+          <span class="fb-link" onclick="go('about',document.getElementById('nb-about'))">About</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a onclick="go('home')">Home</a></li>
+          <li><a onclick="go('maker',document.getElementById('nb-maker'))">Make a quiz</a></li>
+          <li><a onclick="go('library',document.getElementById('nb-library'))">Library</a></li>
+          <li><a onclick="go('play',document.getElementById('nb-play'))">Play</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Learn</h4>
+        <ul>
+          <li><a onclick="go('about',document.getElementById('nb-about'))">About</a></li>
+          <li><a onclick="go('about',document.getElementById('nb-about'))">Changelog</a></li>
+          <li><a onclick="go('about',document.getElementById('nb-about'))">Tech stack</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Creator</h4>
+        <ul>
+          <li><a href="https://github.com/Sorbojit1" target="_blank">@Sorbojit1</a></li>
+          <li><a onclick="openModal('settingsModal')">Settings</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        © 2025 Quizcraft · Built by <a href="https://github.com/Sorbojit1" target="_blank">Sorbojit</a>
+      </div>
+      <div class="footer-made">
+        Made with <span class="heart">❤️</span> by <a href="https://github.com/Sorbojit1" target="_blank" style="margin-left:4px">Sorbojit</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- UNDO BAR -->
+<div class="undo-bar" id="undoBar">
+  ↩ Question removed
+  <button class="undo-btn-m" onclick="undoDelete()">Undo</button>
+</div>
+
+<!-- TOAST STACK -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- EXPORT MODAL -->
+<div class="moverlay" id="exportModal">
+  <div class="modal2">
+    <div class="modal2-head">
+      <span class="modal2-title">Export / Import</span>
+      <button class="modal2-close" onclick="closeModal('exportModal')">✕</button>
+    </div>
+    <div class="modal2-body">
+      <p style="font-size:.83rem;color:var(--tx2);margin-bottom:12px">Copy JSON to export. Paste JSON below and click Import.</p>
+      <textarea class="export-ta" id="exportTA" spellcheck="false"></textarea>
+    </div>
+    <div class="modal2-foot">
+      <button class="btn-sm" onclick="copyExport()">📋 Copy</button>
+      <button class="btn-sm primary" onclick="doImport()">📥 Import from JSON</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="moverlay" id="settingsModal">
+  <div class="modal2">
+    <div class="modal2-head">
+      <span class="modal2-title">⚙ Settings</span>
+      <button class="modal2-close" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+    <div class="modal2-body">
+      <div class="set-row">
+        <div class="set-lbl"><h4>Theme</h4><p>Switch colour mode</p></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-sm" style="flex:none" onclick="setTheme('dark')">🌙 Dark</button>
+          <button class="btn-sm" style="flex:none" onclick="setTheme('light')">☀️ Light</button>
+          <button class="btn-sm" style="flex:none" onclick="setTheme('neon')">💜 Neon</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <div class="set-lbl"><h4>Confetti on 100%</h4><p>Celebrate perfect scores</p></div>
+        <label class="tgl"><input type="checkbox" id="confOn" checked><span class="tgl-s"></span></label>
+      </div>
+      <div class="set-row">
+        <div class="set-lbl"><h4>Custom cursor</h4><p>Yellow dot cursor</p></div>
+        <label class="tgl"><input type="checkbox" id="cursorOn" checked onchange="toggleCursor()"><span class="tgl-s"></span></label>
+      </div>
+      <div class="set-row">
+        <div class="set-lbl"><h4>Keyboard shortcuts</h4><p>A B C D, Enter, T, S, N…</p></div>
+        <label class="tgl"><input type="checkbox" id="kbOn" checked><span class="tgl-s"></span></label>
+      </div>
+      <div class="set-row">
+        <div class="set-lbl"><h4>Clear all data</h4><p>Remove saved quizzes and scores</p></div>
+        <button class="btn-sm danger" style="flex:none" onclick="clearAllData()">🗑 Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
